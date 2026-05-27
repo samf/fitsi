@@ -14,6 +14,11 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Stamp version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          printf 'let fitsiVersion = "%s"\n' "$VERSION" > fitsi/Version.swift
       - name: Build universal binary
         run: swift build -c release --arch arm64 --arch x86_64
       - name: Package
@@ -34,6 +39,11 @@ jobs:
       image: swift:5.10
     steps:
       - uses: actions/checkout@v4
+      - name: Stamp version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          printf 'let fitsiVersion = "%s"\n' "$VERSION" > fitsi/Version.swift
       - name: Build static binary
         run: swift build -c release --static-swift-stdlib
       - name: Package
@@ -54,6 +64,11 @@ jobs:
       image: swift:5.10
     steps:
       - uses: actions/checkout@v4
+      - name: Stamp version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          printf 'let fitsiVersion = "%s"\n' "$VERSION" > fitsi/Version.swift
       - name: Build static binary
         run: swift build -c release --static-swift-stdlib
       - name: Package
@@ -145,9 +160,8 @@ jobs:
             end
 
             test do
-              touch testpath/"sample.txt"
-              assert_equal "hello world",
-                shell_output("#{bin}/fitsi #{testpath}/sample.txt").strip
+              assert_match version.to_s,
+                shell_output("#{bin}/fitsi --version")
             end
           end
           EOF

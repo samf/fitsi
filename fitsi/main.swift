@@ -12,8 +12,13 @@ let arguments = CommandLine.arguments
 let programName = (arguments.first as NSString?)?.lastPathComponent ?? "fitsi"
 
 guard arguments.count == 2 else {
-    FileHandle.standardError.write(Data("Usage: \(programName) <file>\n".utf8))
+    FileHandle.standardError.write(Data("Usage: \(programName) [-V | --version] <file>\n".utf8))
     exit(1)
+}
+
+if arguments[1] == "-V" || arguments[1] == "--version" {
+    print("v\(fitsiVersion)")
+    exit(0)
 }
 
 let path = arguments[1]
