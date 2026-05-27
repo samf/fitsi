@@ -5,7 +5,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/samf/fitscore.git",
       "state" : {
-        "revision" : "5419a16d2dfa945caaa95402650811ac7c8cb6fc"
+        "revision" : "84c8d48a5968bc14ac49d593a3302e103493bdab"
       }
     },
     {

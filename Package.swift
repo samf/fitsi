@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "fitsi",
     dependencies: [
-        .package(url: "https://github.com/samf/fitscore.git", revision: "5419a16d2dfa945caaa95402650811ac7c8cb6fc"),
+        .package(url: "https://github.com/samf/fitscore.git", revision: "84c8d48a5968bc14ac49d593a3302e103493bdab"),
     ],
     targets: [
         .executableTarget(
