@@ -1,0 +1,159 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    name: Build macOS universal
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build universal binary
+        run: swift build -c release --arch arm64 --arch x86_64
+      - name: Package
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          mkdir -p dist
+          tar -czf "dist/fitsi-${TAG}-darwin-universal.tar.gz" \
+            -C .build/apple/Products/Release fitsi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: darwin-universal
+          path: dist/*.tar.gz
+
+  build-linux-x86_64:
+    name: Build Linux x86_64
+    runs-on: ubuntu-latest
+    container:
+      image: swift:5.10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build static binary
+        run: swift build -c release --static-swift-stdlib
+      - name: Package
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          mkdir -p dist
+          tar -czf "dist/fitsi-${TAG}-linux-x86_64.tar.gz" \
+            -C .build/release fitsi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-x86_64
+          path: dist/*.tar.gz
+
+  build-linux-aarch64:
+    name: Build Linux aarch64
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: swift:5.10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build static binary
+        run: swift build -c release --static-swift-stdlib
+      - name: Package
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          mkdir -p dist
+          tar -czf "dist/fitsi-${TAG}-linux-aarch64.tar.gz" \
+            -C .build/release fitsi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-aarch64
+          path: dist/*.tar.gz
+
+  release:
+    name: Publish release and update tap
+    needs: [build-macos, build-linux-x86_64, build-linux-aarch64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Compute SHA256s
+        id: shas
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          DARWIN_FILE="fitsi-${TAG}-darwin-universal.tar.gz"
+          LINUX_X86_FILE="fitsi-${TAG}-linux-x86_64.tar.gz"
+          LINUX_ARM_FILE="fitsi-${TAG}-linux-aarch64.tar.gz"
+          DARWIN_SHA=$(sha256sum "dist/${DARWIN_FILE}" | awk '{print $1}')
+          LINUX_X86_SHA=$(sha256sum "dist/${LINUX_X86_FILE}" | awk '{print $1}')
+          LINUX_ARM_SHA=$(sha256sum "dist/${LINUX_ARM_FILE}" | awk '{print $1}')
+          {
+            echo "tag=${TAG}"
+            echo "version=${VERSION}"
+            echo "darwin_sha=${DARWIN_SHA}"
+            echo "linux_x86_sha=${LINUX_X86_SHA}"
+            echo "linux_arm_sha=${LINUX_ARM_SHA}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "${{ steps.shas.outputs.tag }}" \
+            --title "${{ steps.shas.outputs.tag }}" \
+            --generate-notes \
+            dist/*.tar.gz
+
+      - name: Update Homebrew tap
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          TAG="${{ steps.shas.outputs.tag }}"
+          VERSION="${{ steps.shas.outputs.version }}"
+          BASE_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}"
+
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/samf/homebrew-samf.git" tap
+          mkdir -p tap/Formula
+
+          cat > tap/Formula/fitsi.rb <<EOF
+          class Fitsi < Formula
+            desc "fitsi command-line tool"
+            homepage "https://github.com/${{ github.repository }}"
+            version "${VERSION}"
+
+            on_macos do
+              url "${BASE_URL}/fitsi-${TAG}-darwin-universal.tar.gz"
+              sha256 "${{ steps.shas.outputs.darwin_sha }}"
+            end
+
+            on_linux do
+              on_intel do
+                url "${BASE_URL}/fitsi-${TAG}-linux-x86_64.tar.gz"
+                sha256 "${{ steps.shas.outputs.linux_x86_sha }}"
+              end
+              on_arm do
+                url "${BASE_URL}/fitsi-${TAG}-linux-aarch64.tar.gz"
+                sha256 "${{ steps.shas.outputs.linux_arm_sha }}"
+              end
+            end
+
+            def install
+              bin.install "fitsi"
+            end
+
+            test do
+              touch testpath/"sample.txt"
+              assert_equal "hello world",
+                shell_output("#{bin}/fitsi #{testpath}/sample.txt").strip
+            end
+          end
+          EOF
+
+          cd tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/fitsi.rb
+          git commit -m "fitsi ${VERSION}"
+          git push
