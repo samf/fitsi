@@ -122,6 +122,7 @@ jobs:
             desc "fitsi command-line tool"
             homepage "https://github.com/${{ github.repository }}"
             version "${VERSION}"
+            license "Apache-2.0"
 
             on_macos do
               url "${BASE_URL}/fitsi-${TAG}-darwin-universal.tar.gz"
