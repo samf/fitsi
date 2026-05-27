@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FITS
 
 let arguments = CommandLine.arguments
 let programName = (arguments.first as NSString?)?.lastPathComponent ?? "fitsi"
@@ -22,5 +23,17 @@ guard FileManager.default.isReadableFile(atPath: path) else {
     exit(1)
 }
 
-print("hello world")
+let url = URL(fileURLWithPath: path)
+
+do {
+    guard let fits = try FitsFile.read(contentsOf: url) else {
+        FileHandle.standardError.write(Data("\(programName): '\(path)' is not a valid FITS file\n".utf8))
+        exit(1)
+    }
+    let cards = fits.prime.headerUnit.count
+    print("\(path): read \(cards) header card(s) from primary HDU, \(fits.HDUs.count) extension HDU(s)")
+} catch {
+    FileHandle.standardError.write(Data("\(programName): error reading '\(path)': \(error.localizedDescription)\n".utf8))
+    exit(1)
+}
 

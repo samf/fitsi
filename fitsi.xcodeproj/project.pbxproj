@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A0B873FD2FC72AD80083F40B /* FITSCore in Frameworks */ = {isa = PBXBuildFile; productRef = A0B873FC2FC72AD80083F40B /* FITSCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		A0EB23D72FC64B88005039F2 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -35,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0B873FD2FC72AD80083F40B /* FITSCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +82,7 @@
 			);
 			name = fitsi;
 			packageProductDependencies = (
+				A0B873FC2FC72AD80083F40B /* FITSCore */,
 			);
 			productName = fitsi;
 			productReference = A0EB23D92FC64B88005039F2 /* fitsi */;
@@ -106,6 +112,9 @@
 			);
 			mainGroup = A0EB23D02FC64B88005039F2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A0B873FB2FC72AD80083F40B /* XCRemoteSwiftPackageReference "fitscore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A0EB23DA2FC64B88005039F2 /* Products */;
 			projectDirPath = "";
@@ -289,6 +298,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A0B873FB2FC72AD80083F40B /* XCRemoteSwiftPackageReference "fitscore" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/samf/fitscore";
+			requirement = {
+				kind = revision;
+				revision = 5419a16d2dfa945caaa95402650811ac7c8cb6fc;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A0B873FC2FC72AD80083F40B /* FITSCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0B873FB2FC72AD80083F40B /* XCRemoteSwiftPackageReference "fitscore" */;
+			productName = FITSCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A0EB23D12FC64B88005039F2 /* Project object */;
 }

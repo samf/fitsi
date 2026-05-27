@@ -1,0 +1,22 @@
+{
+  "pins" : [
+    {
+      "identity" : "fitscore",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/samf/fitscore.git",
+      "state" : {
+        "revision" : "5419a16d2dfa945caaa95402650811ac7c8cb6fc"
+      }
+    },
+    {
+      "identity" : "swift-numerics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-numerics",
+      "state" : {
+        "revision" : "6583ac70c326c3ee080c1d42d9ca3361dca816cd",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 2
+}
