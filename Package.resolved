@@ -1,4 +1,5 @@
 {
+  "originHash" : "13da39cf297fb87d913f78b49d150eb67849655a1977e05c43414e8ff472d2a5",
   "pins" : [
     {
       "identity" : "fitscore",
@@ -6,6 +7,15 @@
       "location" : "https://github.com/samf/fitscore.git",
       "state" : {
         "revision" : "84c8d48a5968bc14ac49d593a3302e103493bdab"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "6a52f3251125d74daf04fcbd5e6f08a75d074382",
+        "version" : "1.8.2"
       }
     },
     {
@@ -18,5 +28,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
