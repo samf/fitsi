@@ -13,6 +13,11 @@ let package = Package(
                 .product(name: "FITSCore", package: "fitscore"),
             ],
             path: "fitsi"
+        ),
+        .testTarget(
+            name: "fitsiTests",
+            dependencies: ["fitsi"],
+            path: "Tests/fitsiTests"
         )
     ]
 )
